@@ -6,22 +6,23 @@
 //  Copyright © 2019 原田悠嗣. All rights reserved.
 //
 
-//  ロード中インジケータが表示されること
-//  インジケータはNVActivityIndicatorViewというライブラリを利用すること
-//  インジケータは上タブを含んだ画面全体の中心に表示されること
-//  ロード中にテーブルビューのセルを押せなくして、そのことがユーザーが直感的にわかるようにすること
-//  webView内のリンクによる遷移、toolBarのボタンによる遷移は短時間なことが多いため、インジケータをつけなくてよい。
-//  インジケータ自体のデザイン、色彩は問わない。
-//  インジケータの追加はコード上でもStoryboard上でも構わない
 
+// 機能の追加
 import UIKit
 import XLPagerTabStrip
 import WebKit
 import NVActivityIndicatorView
 
 class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDataSource, UITableViewDelegate, WKNavigationDelegate, XMLParserDelegate{
-
-    // 引っ張って更新
+    
+    
+    // webview
+    @IBOutlet weak var webView: WKWebView!
+    // toolbar(4つのボタンがはいってる)
+    @IBOutlet weak var toolBar: UIToolbar!
+    
+    
+    // 引っ張って更新のもの
     var refreshControl: UIRefreshControl!
 
     // テーブルビューのインスタンスを取得
@@ -41,13 +42,6 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
     // XMLファイルのリンク情報
     var linkString: String = ""
 
-
-    // webview
-    @IBOutlet weak var webView: WKWebView!
-
-    // toolbar(4つのボタンがはいってる)
-    @IBOutlet weak var toolBar: UIToolbar!
-    
     // urlを受け取る
     var url: String = ""
     // itemInfoを受け取る
@@ -59,27 +53,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
     // 画面を暗くするもの
     var indicatorBackgroundView: UIView!
     
-    func showIndicator() {
-        
-        // インジケータビューの背景
-        indicatorBackgroundView = UIView(frame: self.view.bounds)
-        indicatorBackgroundView?.backgroundColor = UIColor.black
-        indicatorBackgroundView?.alpha = 0.4
-        indicatorBackgroundView?.tag = 100100
-        
-        
-        // 作成したviewを表示
-        indicatorBackgroundView?.addSubview(activityIndicatorView)
-        self.view.addSubview(indicatorBackgroundView!)
-        
-    }
     
-    func hideIndicator(){
-        // viewにローディング画面が出ていれば閉じる
-        if let viewWithTag = self.view.viewWithTag(100100) {
-            viewWithTag.removeFromSuperview()
-        }
-    }
     
     
     
@@ -119,22 +93,48 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         
     }
     
+    
+    // 更新時の背景
+    func showIndicator() {
+        
+        // インジケータビューの背景
+        indicatorBackgroundView = UIView(frame: self.view.bounds)
+        indicatorBackgroundView?.backgroundColor = UIColor.black
+        indicatorBackgroundView?.alpha = 0.4
+        indicatorBackgroundView?.tag = 100100
+        
+        
+        // 作成したviewを表示
+        indicatorBackgroundView?.addSubview(activityIndicatorView)
+        self.view.addSubview(indicatorBackgroundView!)
+        
+    }
+    
+    
+    // インジケータを隠す
+    func hideIndicator(){
+        // viewにローディング画面が出ていれば閉じる
+        if let viewWithTag = self.view.viewWithTag(100100) {
+            viewWithTag.removeFromSuperview()
+        }
+    }
+    
     // NVActivityIndicatorのインジケータ開始(startメソッドは書かなくてもOK)
     private func start() {
         activityIndicatorView.startAnimating()
     }
-    
+    // インジケータの終わり
     private func stop() {
         activityIndicatorView.stopAnimating()
     }
     
     
-
+    // 引っぱって出す更新
     @objc func refresh() {
         // 2秒後にdelayを呼ぶ
         perform(#selector(delay), with: nil, afterDelay: 2.0)
     }
-
+    // インジケータの終了
     @objc func delay() {
         parseUrl()
         // refreshControlを終了
@@ -264,6 +264,9 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         
     }
 
+    
+    
+    // webを開いたあとの操作
     // キャンセル
     @IBAction func cancel(_ sender: Any) {
         tableView.isHidden = false
@@ -284,6 +287,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         webView.reload()
     }
 
+    
     func indicatorInfo(for pagerTabStripController: PagerTabStripViewController) -> IndicatorInfo {
         return itemInfo
     }

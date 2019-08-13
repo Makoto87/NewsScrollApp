@@ -6,20 +6,15 @@
 //  Copyright © 2019 原田悠嗣. All rights reserved.
 //
 
-// ロード中インジケータが表示されること
-// インジケータはNVActivityIndicatorViewというライブラリを利用すること
-// インジケータは上タブを含んだ画面全体の中心に表示されること
-// ロード中にテーブルビューのセルを押せなくして、そのことがユーザーが直感的にわかるようにすること
-// webView内のリンクによる遷移、toolBarのボタンによる遷移は短時間なことが多いため、インジケータをつけなくてよい。
-// インジケータ自体のデザイン、色彩は問わない。
-// インジケータの追加はコード上でもStoryboard上でも構わない
 
+// 機能追加
 import UIKit
 import XLPagerTabStrip
 
+
 class MainViewController: ButtonBarPagerTabStripViewController {
 
-    // URLの文字列（yahoo,NHK,週刊文春)
+    // URLを入れた配列（yahoo,NHK,週刊文春)
     let urlList: [String] = ["https://news.yahoo.co.jp/pickup/domestic/rss.xml",
                              "https://www.nhk.or.jp/rss/news/cat0.xml",
                              "http://shukan.bunshun.jp/list/feed/rss"]
@@ -27,10 +22,12 @@ class MainViewController: ButtonBarPagerTabStripViewController {
     // タブの名前の表示
     var iteminfo: [IndicatorInfo] = ["Yahoo!", "NHK", "週刊文春"]
 
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
+    
     // 各VCを返す処理
     override func viewControllers(for pagerTabStripController: PagerTabStripViewController) -> [UIViewController] {
 
