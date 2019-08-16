@@ -6,12 +6,15 @@
 //  Copyright © 2019 原田悠嗣. All rights reserved.
 //
 
+
+// 機能追加
 import UIKit
 import XLPagerTabStrip
 
+
 class MainViewController: ButtonBarPagerTabStripViewController {
 
-    // URLの文字列（yahoo,NHK,週刊文春)
+    // URLを入れた配列（yahoo,NHK,週刊文春)
     let urlList: [String] = ["https://news.yahoo.co.jp/pickup/domestic/rss.xml",
                              "https://www.nhk.or.jp/rss/news/cat0.xml",
                              "http://shukan.bunshun.jp/list/feed/rss"]
@@ -19,10 +22,12 @@ class MainViewController: ButtonBarPagerTabStripViewController {
     // タブの名前の表示
     var iteminfo: [IndicatorInfo] = ["Yahoo!", "NHK", "週刊文春"]
 
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
+    
     // 各VCを返す処理
     override func viewControllers(for pagerTabStripController: PagerTabStripViewController) -> [UIViewController] {
 

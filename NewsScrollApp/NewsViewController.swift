@@ -6,13 +6,23 @@
 //  Copyright © 2019 原田悠嗣. All rights reserved.
 //
 
+
+// 機能の追加
 import UIKit
 import XLPagerTabStrip
 import WebKit
+import NVActivityIndicatorView
 
 class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDataSource, UITableViewDelegate, WKNavigationDelegate, XMLParserDelegate{
-
-    // 引っ張って更新
+    
+    
+    // webview
+    @IBOutlet weak var webView: WKWebView!
+    // toolbar(4つのボタンがはいってる)
+    @IBOutlet weak var toolBar: UIToolbar!
+    
+    
+    // 引っ張って更新のもの
     var refreshControl: UIRefreshControl!
 
     // テーブルビューのインスタンスを取得
@@ -32,18 +42,22 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
     // XMLファイルのリンク情報
     var linkString: String = ""
 
-
-    // webview
-    @IBOutlet weak var webView: WKWebView!
-
-    // toolbar(4つのボタンがはいってる)
-    @IBOutlet weak var toolBar: UIToolbar!
-    
     // urlを受け取る
     var url: String = ""
     // itemInfoを受け取る
     var itemInfo: IndicatorInfo = ""
 
+    // NVActivityIndicatorViewを定義化
+    private var activityIndicatorView: NVActivityIndicatorView!
+    
+    // 画面を暗くするもの
+    var indicatorBackgroundView: UIView!
+    
+    
+    
+    
+    
+    // ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         // refreshControlのインスタンス
@@ -71,13 +85,56 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         toolBar.isHidden = true
 
         parseUrl()
+        
+        // NVActivityIndicatorViewのインジケータを追加
+        activityIndicatorView = NVActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 60, height: 60), type: .lineScale, color: UIColor.gray, padding: 0)
+        activityIndicatorView.center = CGPoint(x: self.view.center.x, y: self.view.center.y - 50) // 位置を中心に設定
+        view.addSubview(activityIndicatorView)
+        
     }
-
+    
+    
+    // 更新時の背景
+    func showIndicator() {
+        
+        // インジケータビューの背景
+        indicatorBackgroundView = UIView(frame: self.view.bounds)
+        indicatorBackgroundView?.backgroundColor = UIColor.black
+        indicatorBackgroundView?.alpha = 0.4
+        indicatorBackgroundView?.tag = 1
+        
+        
+        // 作成したviewを表示
+        indicatorBackgroundView?.addSubview(activityIndicatorView)
+        self.view.addSubview(indicatorBackgroundView!)
+        
+    }
+    
+    
+    // インジケータを隠す
+    func hideIndicator(){
+        // viewにローディング画面が出ていれば閉じる
+        if let viewWithTag = self.view.viewWithTag(1) {
+            viewWithTag.removeFromSuperview()
+        }
+    }
+    
+    // NVActivityIndicatorのインジケータ開始(startメソッドは書かなくてもOK)
+    private func start() {
+        activityIndicatorView.startAnimating()
+    }
+    // インジケータの終わり
+    private func stop() {
+        activityIndicatorView.stopAnimating()
+    }
+    
+    
+    // 引っぱって出す更新
     @objc func refresh() {
         // 2秒後にdelayを呼ぶ
         perform(#selector(delay), with: nil, afterDelay: 2.0)
     }
-
+    // インジケータの終了
     @objc func delay() {
         parseUrl()
         // refreshControlを終了
@@ -99,6 +156,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         // TableViewのリロード
         tableView.reloadData()
     }
+    
     // 解析中に要素の開始タグがあったときに実行されるメソッド
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
 
@@ -184,6 +242,11 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         let urlRequest = NSURLRequest(url: url)
         // ここでロード
         webView.load(urlRequest as URLRequest)
+        // インジゲータh開始
+        start()
+        // 画面を暗くする。タップできなくする
+        showIndicator()
+        
     }
 
     // ページの読み込み完了時に呼ばれる
@@ -194,8 +257,16 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         toolBar.isHidden = false
         // webviewを表示する
         webView.isHidden = false
+        // インジゲータをストップする
+        stop()
+        // 画面を暗くするのをやめる.
+        hideIndicator()
+        
     }
 
+    
+    
+    // webを開いたあとの操作
     // キャンセル
     @IBAction func cancel(_ sender: Any) {
         tableView.isHidden = false
@@ -216,6 +287,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         webView.reload()
     }
 
+    
     func indicatorInfo(for pagerTabStripController: PagerTabStripViewController) -> IndicatorInfo {
         return itemInfo
     }
