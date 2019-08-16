@@ -101,7 +101,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
         indicatorBackgroundView = UIView(frame: self.view.bounds)
         indicatorBackgroundView?.backgroundColor = UIColor.black
         indicatorBackgroundView?.alpha = 0.4
-        indicatorBackgroundView?.tag = 100100
+        indicatorBackgroundView?.tag = 1
         
         
         // 作成したviewを表示
@@ -114,7 +114,7 @@ class NewsViewController: UIViewController, IndicatorInfoProvider, UITableViewDa
     // インジケータを隠す
     func hideIndicator(){
         // viewにローディング画面が出ていれば閉じる
-        if let viewWithTag = self.view.viewWithTag(100100) {
+        if let viewWithTag = self.view.viewWithTag(1) {
             viewWithTag.removeFromSuperview()
         }
     }
